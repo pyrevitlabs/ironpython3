@@ -5,6 +5,7 @@
     <BaseAddress>879755264</BaseAddress>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AssemblyName>pyRevitLabs.IronPython</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
@@ -38,6 +39,7 @@
     <None Include="Lib\**\*.py" Link="lib\%(RecursiveDir)%(Filename)%(Extension)">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <PolicyFile Remove="policy.pyRevitLabs.IronPython.config" />
     <None Include="..\StdLib\Lib\os.py" Link="lib\os.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

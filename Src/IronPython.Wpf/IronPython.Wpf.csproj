@@ -5,6 +5,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <StoreInDLLs>true</StoreInDLLs>
     <UseWPF>true</UseWPF>
+    <AssemblyName>pyRevitLabs.IronPython.Wpf</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
