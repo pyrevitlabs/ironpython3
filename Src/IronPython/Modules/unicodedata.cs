@@ -139,7 +139,7 @@ namespace IronPython.Modules {
 
         [PythonType("unicodedata.UCD")]
         public class UCD {
-            private const string UnicodedataResourceName = "IronPython.Modules.unicodedata.IPyUnicodeData.txt.gz";
+            private const string UnicodedataResourceName = "pyRevitLabs.IronPython.Modules.unicodedata.IPyUnicodeData.txt.gz";
             private const string OtherNotAssigned = "Cn";
 
             private Dictionary<int, CharInfo> database;
