@@ -69,6 +69,11 @@ The optional 'path' argument is ignored -- it's there for compatibility
 with the importer protocol."
             )]
         public object find_module(CodeContext /*!*/ context, string fullname, params object[] args) {
+            PythonContext pc = context.LanguageContext;
+
+            if (pc.BuiltinModules.TryGetValue(fullname, out Type type))
+                return null;
+
             var packedName = MakeFilename(fullname);
 
             foreach (var entry in SearchOrder) {
