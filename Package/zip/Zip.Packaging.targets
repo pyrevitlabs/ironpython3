@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="Current">
- <Target Name="ZipPackage" DependsOnTargets="Stage" AfterTargets="Package" Outputs="$(PackageDir)\IronPython.$(PackageVersion).zip;$(PackageDir)\IronPython.StdLib.$(PackageVersion).zip">
+ <Target Name="ZipPackage" DependsOnTargets="Stage" AfterTargets="Package" Outputs="$(PackageDir)\pyRevitLabs.IronPython.$(PackageVersion).zip;$(PackageDir)\pyRevitLabs.IronPython.StdLib.$(PackageVersion).zip">
     <MakeDir Directories="$(PackageDir)" Condition="!Exists('$(PackageDir)')"/>
 
     <ItemGroup>
@@ -9,11 +9,11 @@
       <ZipFiles Include="scripts/Enter-IronPythonEnvironment.ps1" Link="$(RootDir)Src\Scripts\Enter-IronPythonEnvironment.ps1" />
       <ZipFiles Include="scripts/Install-IronPython.ps1" Link="$(RootDir)Src\Scripts\Install-IronPython.ps1" />
     </ItemGroup>
-    <Zip Files="@(ZipFiles)" ZipFileName="$(PackageDir)\IronPython.$(PackageVersion).zip" WorkingDirectory="$(StageDir)" />
+    <Zip Files="@(ZipFiles)" ZipFileName="$(PackageDir)\pyRevitLabs.IronPython.$(PackageVersion).zip" WorkingDirectory="$(StageDir)" />
 
     <ItemGroup>
       <StdLibFiles Include="$(StageDir)\$(StdLibDirName)\**\*.*" />
     </ItemGroup>
-    <Zip Files="@(StdLibFiles)" ZipFileName="$(PackageDir)\IronPython.StdLib.$(PackageVersion).zip" WorkingDirectory="$(StageDir)\$(StdLibDirName)"/>
+    <Zip Files="@(StdLibFiles)" ZipFileName="$(PackageDir)\pyRevitLabs.IronPython.StdLib.$(PackageVersion).zip" WorkingDirectory="$(StageDir)\$(StdLibDirName)"/>
   </Target>
 </Project>

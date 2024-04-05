@@ -18,9 +18,9 @@
 
   <Target Name="NuGetPackage" DependsOnTargets="Stage" AfterTargets="Package" Inputs="$(NuSpecInputs)" Outputs="$(NuPkgOutputs)">
     <ItemGroup>
-      <DLLsFiles Include="**\DLLs\IronPython.*.dll" />
-      <DLLsFiles Include="**\DLLs\IronPython.*.pdb" />
-      <DLLsFiles Include="**\DLLs\IronPython.*.xml" />
+      <DLLsFiles Include="**\DLLs\pyReviLabs.IronPython.*.dll" />
+      <DLLsFiles Include="**\DLLs\pyReviLabs.IronPython.*.pdb" />
+      <DLLsFiles Include="**\DLLs\pyReviLabs.IronPython.*.xml" />
     </ItemGroup>
 
     <!-- Copy the files from DLLs into the main directory for nuget packaging -->

@@ -10,6 +10,7 @@
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <OutputPath>$(BaseOutputPath)\$(TargetFramework.Replace('-windows', ''))\DLLs</OutputPath>
     <DisableTransitiveProjectReferences>true</DisableTransitiveProjectReferences>
+    <AssemblyName>pyRevitLabs.IronPython.Wpf</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>

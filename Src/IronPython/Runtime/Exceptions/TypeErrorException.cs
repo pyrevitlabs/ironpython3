@@ -27,6 +27,7 @@ namespace IronPython.Runtime.Exceptions {
             : base(message, innerException) {
         }
 #if FEATURE_SERIALIZATION
+        [Obsolete("Obsolete")]
         protected TypeErrorException(SerializationInfo info, StreamingContext context) : base(info, context) { }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2123:OverrideLinkDemandsShouldBeIdenticalToBase")]
@@ -44,7 +45,7 @@ namespace IronPython.Runtime.Exceptions {
                     newEx.InitializeFromClr(this);
                     _pyExceptionObject = newEx;
                 }
-                return _pyExceptionObject; 
+                return _pyExceptionObject;
             }
             set { _pyExceptionObject = value; }
         }

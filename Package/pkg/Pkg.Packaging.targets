@@ -38,7 +38,7 @@
     <Copy SourceFiles="@(StdLibFiles)" DestinationFolder="$(PackageLayoutRootDir)/lib/%(StdLibFiles.RecursiveDir)"/>
     <Copy SourceFiles="@(DLLFiles)" DestinationFolder="$(PackageLayoutRootDir)/DLLs" />
 
-    <Exec Command="pkgbuild --root $(PackageTempFolder) --identifier 'org.dotnet.ironpython34' --version '$(PackageVersion)' $(PackageDir)/IronPython-$(PackageVersion).pkg" />
+    <Exec Command="pkgbuild --root $(PackageTempFolder) --identifier 'org.dotnet.ironpython34' --version '$(PackageVersion)' $(PackageDir)/pyRevitLabs.IronPython-$(PackageVersion).pkg" />
 
     <!-- cleanup the directory -->
     <Exec Command="rm -rf $(PackageTempFolder)" />

@@ -5,6 +5,7 @@
     <BaseAddress>879755264</BaseAddress>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AssemblyName>pyRevitLabs.IronPython</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>

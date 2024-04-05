@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <package xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
-    <id>IronPython</id>
+    <id>pyReviLabs.IronPython</id>
     <title>IronPython</title>
     <version>3.4.0</version>
     <authors>IronPython Contributors, Microsoft</authors>
@@ -36,9 +36,9 @@ This package contains the IronPython interpreter engine.</description>
     </dependencies>
   </metadata>
   <files>
-    <file src="**\IronPython*.dll" target="lib" exclude="**\IronPythonTest.dll;**\DLLs\*.dll;netcoreapp3.1\**\*;net7.0*\**\*;net8.0*\**\*" />
-    <file src="**\IronPython*.pdb" target="lib" exclude="**\IronPythonTest.pdb;**\DLLs\*.pdb;netcoreapp3.1\**\*;net7.0*\**\*;net8.0*\**\*" />
-    <file src="**\IronPython*.xml" target="lib" exclude="**\IronPythonTest.xml;**\DLLs\*.xml;netcoreapp3.1\**\*;net7.0*\**\*;net8.0*\**\*" />
+    <file src="**\pyRevitLabs.IronPython*.dll" target="lib" exclude="**\IronPythonTest.dll;**\DLLs\*.dll;netcoreapp3.1\**\*;net7.0*\**\*;net8.0*\**\*" />
+    <file src="**\pyRevitLabs.IronPython*.pdb" target="lib" exclude="**\IronPythonTest.pdb;**\DLLs\*.pdb;netcoreapp3.1\**\*;net7.0*\**\*;net8.0*\**\*" />
+    <file src="**\pyRevitLabs.IronPython*.xml" target="lib" exclude="**\IronPythonTest.xml;**\DLLs\*.xml;netcoreapp3.1\**\*;net7.0*\**\*;net8.0*\**\*" />
     <file src="LICENSE" />
     <file src="..\..\..\nuget\README.md" target="" />
     <file src="..\..\..\..\Documentation\logo.png" target="" />

@@ -13,6 +13,7 @@
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)$(Configuration)\$(TargetFramework)\DLLs</IntermediateOutputPath>
     <OutputPath>$(BaseOutputPath)\$(TargetFramework)\DLLs</OutputPath>
     <DisableTransitiveProjectReferences>true</DisableTransitiveProjectReferences>
+    <AssemblyName>pyRevitLabs.IronPython.SQLite</AssemblyName>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
