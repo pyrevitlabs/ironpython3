@@ -14,6 +14,9 @@ using IronPythonTest.Util;
 
 using NUnit.Framework;
 
+using OSPlatform = System.Runtime.InteropServices.OSPlatform;
+using RuntimeInformation = System.Runtime.InteropServices.RuntimeInformation;
+
 namespace IronPythonTest.Cases {
     public class TestInfo {
         public TestInfo(string path, string baseName, string rootDir, TestManifest testManifest) {

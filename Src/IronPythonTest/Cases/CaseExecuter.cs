@@ -23,6 +23,9 @@ using Microsoft.Scripting.Hosting;
 
 using IronPythonTest.Util;
 
+using OSPlatform = System.Runtime.InteropServices.OSPlatform;
+using RuntimeInformation = System.Runtime.InteropServices.RuntimeInformation;
+
 namespace IronPythonTest.Cases {
     internal class CaseExecuter {
         private static string Executable {
