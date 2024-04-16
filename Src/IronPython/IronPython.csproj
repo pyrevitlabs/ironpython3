@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DLR\Src\Microsoft.Dynamic\Microsoft.Dynamic.csproj" />
+    <ProjectReference Include="..\..\..\pyRevitLabs.dlr3\Src\Microsoft.Dynamic\Microsoft.Dynamic.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -39,6 +39,7 @@
     <None Include="Lib\**\*.py" Link="lib\%(RecursiveDir)%(Filename)%(Extension)">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <PolicyFile Remove="policy.pyRevitLabs.IronPython.config" />
     <None Include="..\StdLib\Lib\os.py" Link="lib\os.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

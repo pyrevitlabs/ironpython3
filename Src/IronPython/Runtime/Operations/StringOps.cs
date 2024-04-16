@@ -391,6 +391,11 @@ namespace IronPython.Runtime.Operations {
             return Char.ToUpper(self[0], CultureInfo.InvariantCulture) + self.Substring(1).ToLower(CultureInfo.InvariantCulture);
         }
 
+        /// <summary>
+        /// Returns a copy of this string converted to lowercase
+        /// </summary>
+        public static string casefold([NotNone] this string self) => lower(self);
+
         //  default fillchar (padding char) is a space
         public static string center([NotNone] this string self, int width) {
             return center(self, width, ' ');

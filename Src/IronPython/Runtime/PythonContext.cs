@@ -297,7 +297,7 @@ namespace IronPython.Runtime {
                 if (PythonOptions.NoImportLib) return;
 
                 try {
-                    var _frozen_importlib = LoadModuleFromResource("_frozen_importlib", "IronPython.Modules._bootstrap.py");
+                    var _frozen_importlib = LoadModuleFromResource("_frozen_importlib", "pyRevitLabs.IronPython.Modules._bootstrap.py");
 
                     PythonOps.Invoke(SharedClsContext, _frozen_importlib, "_install", SystemState, GetBuiltinModule("_imp"));
                 } catch { }
@@ -1691,7 +1691,7 @@ namespace IronPython.Runtime {
             Assembly ironPythonModules = null;
 
             try {
-                ironPythonModules = DomainManager.Platform.LoadAssembly(GetIronPythonAssembly("IronPython.Modules"));
+                ironPythonModules = DomainManager.Platform.LoadAssembly(GetIronPythonAssembly("pyRevitLabs.IronPython.Modules"));
             } catch (FileNotFoundException) {
                 // IronPython.Modules is not available, continue without it...
             }
