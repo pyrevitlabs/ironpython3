@@ -346,7 +346,7 @@ namespace IronPython.Runtime.Operations {
             return PythonOps.FsPath(path) switch {
                 string s => s,
                 Extensible<string> es => es,
-                Bytes b => b.decode(context, SysModule.getfilesystemencoding(), SysModule.getfilesystemencodeerrors()),
+                Bytes b => b.decode(context, SysModule.getfilesystemencoding(context), SysModule.getfilesystemencodeerrors()),
                 _ => throw new InvalidOperationException(),
             };
         }
@@ -475,7 +475,8 @@ namespace IronPython.Runtime.Operations {
             return false;
         }
 
-        internal static bool IsInstance(CodeContext/*!*/ context, object? o, [NotNull]object? typeinfo) {
+        // used by Ironclad
+        public static bool IsInstance(CodeContext/*!*/ context, object? o, [NotNull]object? typeinfo) {
             if (typeinfo == null) throw PythonOps.TypeError("isinstance: arg 2 must be a class, type, or tuple of classes and types");
 
             if (typeinfo is PythonTuple tt) {
@@ -1062,7 +1063,7 @@ namespace IronPython.Runtime.Operations {
             }
 
             if (o is IMembersList memList) {
-                return new PythonList(memList.GetMemberNames());
+                return new PythonList(context, memList.GetMemberNames());
             }
 
             if (o is IPythonObject po) {
@@ -1771,7 +1772,7 @@ namespace IronPython.Runtime.Operations {
         /// LIST_EXTEND
         /// </summary>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public static void ListExtend(PythonList list, object? o) => list.extend(o);
+        public static void ListExtend(PythonList list, object? o) => list.extend(DefaultContext.Default, o);
 
         /// <summary>
         /// LIST_TO_TUPLE
@@ -1960,7 +1961,14 @@ namespace IronPython.Runtime.Operations {
             return PythonOps.Invoke(context, f, "readline");
         }
 
-        internal static void PrintWithDest(CodeContext/*!*/ context, object dest, object o, bool noNewLine = false, bool flush = false) {
+        // used by Ironclad
+        public static void PrintWithDest(CodeContext/*!*/ context, object dest, object o)
+            => PrintWithDestHelper(context, dest, o, noNewLine: false, flush: false);
+
+        internal static void PrintWithDestNoNewline(CodeContext/*!*/ context, object dest, object o, bool flush = false)
+            => PrintWithDestHelper(context, dest, o, noNewLine: true, flush: flush);
+
+        private static void PrintWithDestHelper(CodeContext/*!*/ context, object dest, object o, bool noNewLine, bool flush) {
             Write(context, dest, ToString(context, o));
             if (!noNewLine) Write(context, dest, "\n");
 
@@ -2001,7 +2009,6 @@ namespace IronPython.Runtime.Operations {
             pc.CallWithContext(context, dispHook, value);
         }
 
-#if FEATURE_FULL_CONSOLE
         internal static void PrintException(CodeContext/*!*/ context, Exception/*!*/ exception, object? console = null) {
             PythonContext pc = context.LanguageContext;
             PythonTuple exInfo = GetExceptionInfoLocal(context, exception);
@@ -2011,14 +2018,15 @@ namespace IronPython.Runtime.Operations {
 
             object exceptHook = pc.GetSystemStateValue("excepthook");
             if (exceptHook is BuiltinFunction bf && bf.DeclaringType == typeof(SysModule) && bf.Name == "excepthook") {
-                // builtin except hook, display it to the console which may do nice coloring
+                // builtin except hook
                 if (console is IConsole con) {
+                    // display it to the console which may do nice coloring
                     con.WriteLine(pc.FormatException(exception), Style.Error);
                 } else {
                     PrintWithDest(context, pc.SystemStandardError, pc.FormatException(exception));
                 }
             } else {
-                // user defined except hook or no console
+                // user defined except hook
                 try {
                     PythonCalls.Call(context, exceptHook, exInfo[0], exInfo[1], exInfo[2]);
                 } catch (Exception e) {
@@ -2031,7 +2039,6 @@ namespace IronPython.Runtime.Operations {
                 }
             }
         }
-#endif
 
         #endregion
 
@@ -2638,8 +2645,8 @@ namespace IronPython.Runtime.Operations {
         }
 
 
-        public static PythonList CopyAndVerifyParamsList(PythonFunction function, object list) {
-            return new PythonList(list);
+        public static PythonList CopyAndVerifyParamsList(CodeContext context, PythonFunction function, object list) {
+            return new PythonList(context, list);
         }
 
         public static PythonTuple UserMappingToPythonTuple(CodeContext/*!*/ context, object list, string funcName) {
@@ -3242,24 +3249,24 @@ namespace IronPython.Runtime.Operations {
             return ((PythonGenerator)self).CheckThrowableAndReturnSendValue();
         }
 
-        public static ItemEnumerable CreateItemEnumerable(object source, object callable, CallSite<Func<CallSite, CodeContext, object, int, object>> site) {
-            return new ItemEnumerable(source, callable, site);
+        public static ItemEnumerable CreateItemEnumerable(CodeContext context, object source, object callable, CallSite<Func<CallSite, CodeContext, object, int, object>> site) {
+            return new ItemEnumerable(context, source, callable, site);
         }
 
         public static DictionaryKeyEnumerator MakeDictionaryKeyEnumerator(PythonDictionary dict) {
             return new DictionaryKeyEnumerator(dict._storage);
         }
 
-        public static IEnumerable CreatePythonEnumerable(object baseObject) {
-            return PythonEnumerable.Create(baseObject);
+        public static IEnumerable CreatePythonEnumerable(CodeContext context, object baseObject) {
+            return PythonEnumerable.Create(context, baseObject);
         }
 
-        public static IEnumerator CreateItemEnumerator(object source, object callable, CallSite<Func<CallSite, CodeContext, object, int, object>> site) {
-            return new ItemEnumerator(source, callable, site);
+        public static IEnumerator CreateItemEnumerator(CodeContext context, object source, object callable, CallSite<Func<CallSite, CodeContext, object, int, object>> site) {
+            return new ItemEnumerator(context, source, callable, site);
         }
 
-        public static IEnumerator CreatePythonEnumerator(object baseObject) {
-            return PythonEnumerator.Create(baseObject);
+        public static IEnumerator CreatePythonEnumerator(CodeContext context, object baseObject) {
+            return PythonEnumerator.Create(context, baseObject);
         }
 
         public static bool ContainsFromEnumerable(CodeContext/*!*/ context, object enumerable, object value) {
@@ -3361,7 +3368,7 @@ namespace IronPython.Runtime.Operations {
             message = FormatWarning(message, args);
 
             if (warn == null) {
-                PythonOps.PrintWithDest(context, pc.SystemStandardError, "warning: " + category.Name + ": " + message);
+                PythonOps.PrintWithDest(context, pc.SystemStandardError, $"warning: {category.Name}: {message}");
             } else {
                 PythonOps.CallWithContext(context, warn, message, category);
             }
@@ -3377,7 +3384,7 @@ namespace IronPython.Runtime.Operations {
             }
 
             if (warn == null) {
-                PythonOps.PrintWithDest(context, pc.SystemStandardError, $"{filename}:{lineNo}: {category.Name}: {message}\n", noNewLine: true);
+                PythonOps.PrintWithDest(context, pc.SystemStandardError, $"{filename}:{lineNo}: {category.Name}: {message}");
             } else {
                 PythonOps.CallWithContext(context, warn, message, category, filename ?? "", lineNo);
             }

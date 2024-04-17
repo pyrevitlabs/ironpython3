@@ -15,15 +15,15 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ApplicationFiles Include="$(StageDir)/net462/*.exe" />
-      <ApplicationFiles Include="$(StageDir)/net462/*.dll" />
+      <ApplicationFiles Include="$(StageDir)/net48/*.exe" />
+      <ApplicationFiles Include="$(StageDir)/net48/*.dll" />
     </ItemGroup>
 
     <ItemGroup>
-      <DLLFiles Include="$(StageDir)/net462/DLLs/*.dll" />
+      <DLLFiles Include="$(StageDir)/net48/DLLs/*.dll" />
     </ItemGroup>
 
-    <Exec Command="chmod 777 $(StageDir)/net462/*.exe" />
+    <Exec Command="chmod 777 $(StageDir)/net48/*.exe" />
     <Exec Command="rm -rf $(PackageTempFolder)" />
     <Exec Command="mkdir -p $(PackageTempFolder)" />
 
@@ -38,7 +38,7 @@
     <Copy SourceFiles="@(StdLibFiles)" DestinationFolder="$(PackageLayoutRootDir)/lib/%(StdLibFiles.RecursiveDir)"/>
     <Copy SourceFiles="@(DLLFiles)" DestinationFolder="$(PackageLayoutRootDir)/DLLs" />
 
-    <Exec Command="pkgbuild --root $(PackageTempFolder) --identifier 'org.dotnet.ironpython34' --version '$(PackageVersion)' $(PackageDir)/IronPython-$(PackageVersion).pkg" />
+    <Exec Command="pkgbuild --root $(PackageTempFolder) --identifier 'org.dotnet.ironpython34' --version '$(PackageVersion)' $(PackageDir)/pyRevitLabs.IronPython-$(PackageVersion).pkg" />
 
     <!-- cleanup the directory -->
     <Exec Command="rm -rf $(PackageTempFolder)" />

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net462</TargetFrameworks>
+    <TargetFrameworks>net48;net6.0</TargetFrameworks>
     <BaseAddress>879755264</BaseAddress>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -47,6 +47,7 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Modules\unicodedata\IPyUnicodeData.txt.gz" />
+    <EmbeddedResource Include="Modules\unicodedata\IPyUnicodeData-3.2.0.txt.gz" />
     <EmbeddedResource Include="..\StdLib\Lib\importlib\_bootstrap.py" Link="Modules\_bootstrap.py" />
   </ItemGroup>
 
@@ -66,7 +67,7 @@
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-    <PackageReference Include="System.Text.Encoding.CodePages" Version="4.6.0" />
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="4.7.0" />
   </ItemGroup>
 
   <Import Project="$(AfterTargetFiles)" />

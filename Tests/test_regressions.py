@@ -826,6 +826,8 @@ class C:
 
     @skipUnlessIronPython()
     def test_gh1435(self):
+        if not self.has_csc(): raise unittest.SkipTest("missing csc")
+
         import clr
         code = """
     using System;
@@ -1696,5 +1698,27 @@ plistlib.loads(plistlib.dumps({})) # check that this does not fail
         import select
         with self.assertRaises(OSError):
             select.select([], [], [])
+
+    @skipUnlessIronPython()
+    def test_ipy3_gh1649(self):
+        # https://github.com/IronLanguages/ironpython3/issues/1649
+
+        # IntPtr equality used to work in IronPython 2
+        import System
+        self.assertEqual(System.IntPtr.Zero, System.IntPtr.Zero)
+
+    def test_map_type_int(self):
+        self.assertEqual(list(map(type, [0])), [type(0)])
+
+    def test_ipy3_gh1135(self):
+        # https://github.com/IronLanguages/ironpython3/issues/1135
+        import sys
+        import subprocess
+        with subprocess.Popen([sys.executable, '-c', 'print("aaa", end="")'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT) as p:
+            out, err = p.communicate()
+
+        # ensure out is the expected value and not empty
+        self.assertEqual(out, b"aaa")
+
 
 run_test(__name__)

@@ -304,7 +304,7 @@ namespace IronPython.Runtime {
 
                 PythonModule LoadModuleFromResource(string name, string resourceName) {
                     var sourceUnit = CreateSourceUnit(new ResourceStreamContentProvider(resourceName), null, DefaultEncoding, SourceCodeKind.File);
-                    var moduleOptions = ModuleOptions.Initialize | ModuleOptions.Optimized;
+                    var moduleOptions = ModuleOptions.Initialize;
                     var scriptCode = GetScriptCode(sourceUnit, name, moduleOptions);
                     var scope = scriptCode.CreateScope();
                     return InitializeModule(null, ((PythonScopeExtension)scope.GetExtension(ContextId)).ModuleContext, scriptCode, moduleOptions);
@@ -732,6 +732,7 @@ namespace IronPython.Runtime {
             };
             flags.quiet = PythonOptions.Quiet ? 1 : 0;
             flags.isolated = PythonOptions.Isolated ? 1 : 0;
+            flags.utf8_mode = PythonOptions.Utf8Mode ? 1 : 0;
         }
 
         internal bool ShouldInterpret(PythonCompilerOptions options, SourceUnit source) {
@@ -1128,6 +1129,15 @@ namespace IronPython.Runtime {
             return copyRegModule;
         }
 
+        private object strptimeModule;
+
+        internal object GetStrptimeModule() {
+            if (strptimeModule is null) {
+                strptimeModule = Importer.ImportModule(SharedContext, new PythonDictionary(), "_strptime", false, 0);
+            }
+            return strptimeModule;
+        }
+
         public object GetWarningsModule() {
             object warnings = null;
             try {
@@ -1250,7 +1260,7 @@ namespace IronPython.Runtime {
         public override ICollection<string> GetSearchPaths() {
             List<string> result = new List<string>();
             if (TryGetSystemPath(out PythonList paths)) {
-                IEnumerator ie = PythonOps.GetEnumerator(paths);
+                IEnumerator ie = PythonOps.GetEnumerator(SharedContext, paths);
                 while (ie.MoveNext()) {
                     if (TryConvertToString(ie.Current, out string str)) {
                         result.Add(str);
@@ -1261,7 +1271,7 @@ namespace IronPython.Runtime {
         }
 
         public override void SetSearchPaths(ICollection<string> paths) {
-            SetSystemStateValue("path", new PythonList(paths));
+            SetSystemStateValue("path", new PythonList(SharedContext, paths));
         }
 
         public override void Shutdown() {
@@ -1291,11 +1301,9 @@ namespace IronPython.Runtime {
                     PythonCalls.Call(SharedContext, callable);
                 }
             } finally {
-#if FEATURE_BASIC_CONSOLE
                 if (PythonOptions.PerfStats) {
                     PerfTrack.DumpStats();
                 }
-#endif
             }
 
             Flush(SharedContext, SystemStandardOut);
@@ -1858,20 +1866,21 @@ namespace IronPython.Runtime {
 
         private void SetStandardIO() {
             SharedIO io = DomainManager.SharedIO;
+            io.ConsoleSupportLevel = PythonOptions.ConsoleSupportLevel;
 
-            var stdin = PythonIOModule.CreateConsole(this, io, ConsoleStreamType.Input, "<stdin>", out PythonIOModule.FileIO fstdin);
-            var stdout = PythonIOModule.CreateConsole(this, io, ConsoleStreamType.Output, "<stdout>", out PythonIOModule.FileIO fstdout);
-            var stderr = PythonIOModule.CreateConsole(this, io, ConsoleStreamType.ErrorOutput, "<stderr>", out PythonIOModule.FileIO fstderr);
+            var stdin = PythonIOModule.CreateConsole(this, io, ConsoleStreamType.Input, "<stdin>", out StreamBox sstdin);
+            var stdout = PythonIOModule.CreateConsole(this, io, ConsoleStreamType.Output, "<stdout>", out StreamBox sstdout);
+            var stderr = PythonIOModule.CreateConsole(this, io, ConsoleStreamType.ErrorOutput, "<stderr>", out StreamBox sstderr);
 
-            FileManager.AddToStrongMapping(fstdin, 0);
+            FileManager.Add(0, sstdin);
             SetSystemStateValue("__stdin__", stdin);
             SetSystemStateValue("stdin", stdin);
 
-            FileManager.AddToStrongMapping(fstdout, 1);
+            FileManager.Add(1, sstdout);
             SetSystemStateValue("__stdout__", stdout);
             SetSystemStateValue("stdout", stdout);
 
-            FileManager.AddToStrongMapping(fstderr, 2);
+            FileManager.Add(2, sstderr);
             SetSystemStateValue("__stderr__", stderr);
             SetSystemStateValue("stderr", stderr);
         }

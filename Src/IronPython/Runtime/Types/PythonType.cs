@@ -308,6 +308,9 @@ type(name, bases, dict) -> creates a new type instance with the given name, base
         }
 
         public static object __new__(CodeContext/*!*/ context, object cls, object o) {
+            if (cls == TypeCache.PythonType && o?.GetType() == typeof(int)) {
+                return TypeCache.BigInteger;  // PEP 237: int/long unification (GH #52)
+            }
             return DynamicHelpers.GetPythonType(o);
         }
 
@@ -1293,15 +1296,8 @@ type(name, bases, dict) -> creates a new type instance with the given name, base
         }
 
         internal bool TryGetCustomSetAttr(CodeContext context, out PythonTypeSlot pts) {
-            PythonContext pc = context.LanguageContext;
-            return pc.Binder.TryResolveSlot(
-                    context,
-                    DynamicHelpers.GetPythonType(this),
-                    this,
-                    "__setattr__",
-                    out pts) &&
-                    pts is BuiltinMethodDescriptor &&
-                    ((BuiltinMethodDescriptor)pts).DeclaringType != typeof(PythonType);
+            return DynamicHelpers.GetPythonType(this).TryResolveSlot(context, "__setattr__", out pts) &&
+                    (pts is not BuiltinMethodDescriptor descr || descr.DeclaringType != typeof(PythonType));
         }
 
         internal void SetCustomMember(CodeContext/*!*/ context, string name, object value) {
@@ -1751,7 +1747,7 @@ type(name, bases, dict) -> creates a new type instance with the given name, base
                         ? context.LanguageContext.GetSiteCacheForSystemType(UnderlyingSystemType).GetDirSite(context)
                         : _siteCache.GetDirSite(context);
 
-                    return new PythonList(dirSite.Target(dirSite, context, dir));
+                    return new PythonList(context, dirSite.Target(dirSite, context, dir));
                 }
             }
 
@@ -1794,7 +1790,7 @@ type(name, bases, dict) -> creates a new type instance with the given name, base
 
             List<string> strKeys = new List<string>(keys.Keys);
             strKeys.Sort();
-            res.extend(strKeys);
+            res.ExtendNoLock(strKeys);
 
             return res;
         }

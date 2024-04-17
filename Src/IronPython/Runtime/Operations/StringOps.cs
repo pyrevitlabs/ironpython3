@@ -1766,7 +1766,7 @@ namespace IronPython.Runtime.Operations {
                     case 65000: name = "utf-7"; break;
                     case 65001: name = "utf-8"; break;
                 }
-#if !NETCOREAPP && !NETSTANDARD
+#if NETFRAMEWORK
                 if (encoding.IsBrowserDisplay) {
                     name = encoding.WebName;
                 }
@@ -2001,7 +2001,7 @@ namespace IronPython.Runtime.Operations {
             internal static readonly IDictionary<string, Lazy<Encoding?>> Codecs;
 
             static CodecsInfo() {
-#if NETCOREAPP || NETSTANDARD
+#if !NETFRAMEWORK
                 // This ensures that Encoding.GetEncoding(0) will return the default Windows ANSI code page
                 Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 #endif
@@ -2084,7 +2084,9 @@ namespace IronPython.Runtime.Operations {
 #if DEBUG
                 foreach (KeyValuePair<string, Lazy<Encoding?>> kvp in d) {
                     // all codecs should be stored in lowercase because we only look up from lowercase strings
+                    #pragma warning disable CA1862 // disable warning about comparing with ToLower()
                     Debug.Assert(kvp.Key.ToLower(CultureInfo.InvariantCulture) == kvp.Key);
+                    #pragma warning restore
                     // all codec names should use underscores instead of dashes to match lookup values
                     Debug.Assert(kvp.Key.IndexOf('-') < 0);
                 }

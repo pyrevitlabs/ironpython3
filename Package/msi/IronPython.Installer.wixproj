@@ -28,7 +28,7 @@
       <Value>$(BindInputPaths)\lib</Value>
     </WixConstant>
     <WixConstant Include="PlatformDir">
-      <Value>$(BindInputPaths)\net462</Value>
+      <Value>$(BindInputPaths)\net48</Value>
     </WixConstant>
   </ItemGroup>
   <PropertyGroup>

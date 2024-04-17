@@ -2,8 +2,6 @@
 // The .NET Foundation licenses this file to you under the Apache 2.0 License.
 // See the LICENSE file in the project root for more information.
 
-#if FEATURE_FULL_CONSOLE
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -38,9 +36,9 @@ namespace IronPython.Hosting {
         protected override string Logo => PythonContext.PythonOptions.Quiet ? null : GetLogoDisplay();
 
         /// <summary>
-        /// Returns the display look for IronPython.  
-        /// 
-        /// The returned string uses This \n instead of Environment.NewLine for it's line seperator 
+        /// Returns the display look for IronPython.
+        ///
+        /// The returned string uses This \n instead of Environment.NewLine for it's line seperator
         /// because it is intended to be outputted through the Python I/O system.
         /// </summary>
         public static string GetLogoDisplay() {
@@ -87,21 +85,29 @@ namespace IronPython.Hosting {
                     return -1;
                 }
 
-                // get the run_module method
+                // get the _run_module_as_main method
                 try {
-                    runMod = PythonOps.GetBoundAttr(PythonContext.SharedContext, runpy, "run_module");
+                    runMod = PythonOps.GetBoundAttr(PythonContext.SharedContext, runpy, "_run_module_as_main");
                 } catch (Exception) {
-                    Console.WriteLine("Could not access runpy.run_module", Style.Error);
+                    Console.WriteLine("Could not access runpy._run_module_as_main", Style.Error);
                     return -1;
+                }
+
+                if (Scope == null) {
+                    Scope = CreateScope();
+                }
+
+                var argv = PythonContext.GetSystemStateValue("argv") as PythonList;
+                if (argv is not null) {
+                    argv[0] = "-m";
                 }
 
                 // call it with the name of the module to run
                 try {
-                    PythonCalls.CallWithKeywordArgs(
+                    PythonCalls.Call(
                         PythonContext.SharedContext,
                         runMod,
-                        new object[] { Options.ModuleToRun, "__main__", ScriptingRuntimeHelpers.True },
-                        new string[] { "run_name", "alter_sys" }
+                        Options.ModuleToRun
                     );
                 } catch (SystemExitException e) {
                     return GetEffectiveExitCode(e);
@@ -213,7 +219,6 @@ namespace IronPython.Hosting {
         }
 
         private void InitializePath(ref int pathIndex) {
-
             // paths, environment vars
             if (!Options.IgnoreEnvironmentVariables) {
                 string path = Environment.GetEnvironmentVariable("IRONPYTHONPATH");
@@ -260,6 +265,7 @@ namespace IronPython.Hosting {
                     if (File.Exists(runner)) {
                         executable = runner;
                     } else {
+                        // TODO: was for .NET Core 2.1, can we drop this?
                         runner = Path.Combine(prefix, name + ".bat");
                         if (File.Exists(runner)) executable = runner;
                     }
@@ -307,7 +313,7 @@ namespace IronPython.Hosting {
 
         /// <summary>
         /// Loads any extension DLLs present in sys.prefix\DLLs directory and adds references to them.
-        /// 
+        ///
         /// This provides an easy drop-in location for .NET assemblies which should be automatically referenced
         /// (exposed via import), COM libraries, and pre-compiled Python code.
         /// </summary>
@@ -428,7 +434,7 @@ namespace IronPython.Hosting {
         /// Attempts to run a single interaction and handle any language-specific
         /// exceptions.  Base classes can override this and call the base implementation
         /// surrounded with their own exception handling.
-        /// 
+        ///
         /// Returns null if successful and execution should continue, or an exit code.
         /// </summary>
         private int? TryInteractiveActionWorker() {
@@ -452,8 +458,8 @@ namespace IronPython.Hosting {
         }
 
         /// <summary>
-        /// Parses a single interactive command and executes it.  
-        /// 
+        /// Parses a single interactive command and executes it.
+        ///
         /// Returns null if successful and execution should continue, or the appropiate exit code.
         /// </summary>
         private int? RunOneInteraction() {
@@ -637,5 +643,3 @@ namespace IronPython.Hosting {
 
     }
 }
-
-#endif

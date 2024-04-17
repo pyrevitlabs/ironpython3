@@ -3,7 +3,7 @@
 <!-- Do not remove this test for UTF-8: if “Ω” doesn’t appear as greek uppercase omega letter enclosed in quotation marks, you should use an editor that supports UTF-8, not this one. -->
 <package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
   <metadata>
-    <id>ironpython</id>
+    <id>pyRevitLabs.IronPython</id>
     <version>3.4.0</version>
     <packageSourceUrl>https://github.com/IronLanguages/ironpython3/tree/master/Package/choco</packageSourceUrl>
     <title>IronPython</title>
@@ -20,8 +20,8 @@
     <mailingListUrl>https://ironpython.groups.io/g/users</mailingListUrl>
   </metadata>
   <files>
-    <file src="$STAGEDIR$\net462\*.dll;$STAGEDIR$\net462\*.exe" />
-    <file src="$STAGEDIR$\net462\DLLs\**" target="DLLs" exclude="**\*.xml" />
+    <file src="$STAGEDIR$\net48\*.dll;$STAGEDIR$\net48\*.exe" />
+    <file src="$STAGEDIR$\net48\DLLs\**" target="DLLs" exclude="**\*.xml" />
     <file src="$STAGEDIR$\lib\**" target="lib" />
     <file src="$STAGEDIR$\LICENSE" />
     <file src="README.md" />

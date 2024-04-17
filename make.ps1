@@ -4,7 +4,7 @@ Param(
     [Parameter(Position=1)]
     [String] $target = "build",
     [String] $configuration = "Release",
-    [String[]] $frameworks=@('net462','netcoreapp2.1','netcoreapp3.1','net6.0'),
+    [String[]] $frameworks=@('net48', 'net6.0'),
     [String] $platform = "x64",
     [switch] $runIgnored,
     [int] $jobs = [System.Environment]::ProcessorCount
@@ -16,30 +16,6 @@ $ErrorActionPreference="Continue"
 [bool] $global:isUnix = [System.Environment]::OSVersion.Platform -eq [System.PlatformID]::Unix
 
 $_BASEDIR = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent
-
-function EnsureMSBuild() {
-    $_VSWHERE = [System.IO.Path]::Combine(${env:ProgramFiles(x86)}, 'Microsoft Visual Studio\Installer\vswhere.exe')
-    $_VSINSTPATH = ''
-
-    if([System.IO.File]::Exists($_VSWHERE)) {
-        $_VSINSTPATH = & "$_VSWHERE" -latest -requires Microsoft.Component.MSBuild -property installationPath
-    } else {
-        Write-Error "Visual Studio 2019 16.8 or later is required"
-        Exit 1
-    }
-
-    if(-not [System.IO.Directory]::Exists($_VSINSTPATH)) {
-        Write-Error "Could not determine installation path to Visual Studio"
-        Exit 1
-    }
-
-    if([System.IO.File]::Exists([System.IO.Path]::Combine($_VSINSTPATH, 'MSBuild\Current\Bin\MSBuild.exe'))) {
-        $_MSBUILDPATH = [System.IO.Path]::Combine($_VSINSTPATH, 'MSBuild\Current\Bin\')
-        if ($env:PATH -split ';' -notcontains $_MSBUILDPATH) {
-            $env:PATH = [String]::Join(';', $env:PATH, $_MSBUILDPATH)
-        }
-    }
-}
 
 function Main([String] $target, [String] $configuration) {
     # verify that the DLR submodule has been initialized
@@ -263,7 +239,7 @@ switch -wildcard ($target) {
     # utility targets
     "ngen"          {
         if(!$global:isUnix) {
-            $imagePath = [System.IO.Path]::Combine($_BASEDIR, "bin\$configuration\net462\ipy.exe")
+            $imagePath = [System.IO.Path]::Combine($_BASEDIR, "bin\$configuration\net48\ipy.exe")
             & "${env:SystemRoot}\Microsoft.NET\Framework\v4.0.30319\ngen.exe" install $imagePath
         }
     }

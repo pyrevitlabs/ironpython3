@@ -330,7 +330,6 @@ namespace IronPython.Runtime.Types {
         }
 
         internal static string CreateAutoDoc(MethodBase info, string name, int endParamSkip, bool includeSelf) {
-#if FEATURE_FULL_CONSOLE
             int lineWidth;
             try {
                 lineWidth = Console.WindowWidth - 30;
@@ -338,9 +337,6 @@ namespace IronPython.Runtime.Types {
                 // console output has been redirected.
                 lineWidth = 80;
             }
-#else
-            int lineWidth = 80;
-#endif
             var docInfo = GetOverloadDoc(info, name, endParamSkip, includeSelf);
             StringBuilder ret = new StringBuilder();
 
@@ -542,7 +538,7 @@ namespace IronPython.Runtime.Types {
             return location;
         }
 
-#if !NETCOREAPP && !NETSTANDARD
+#if NETFRAMEWORK
         private const string _frameworkReferencePath = @"Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0";
 #endif
 
@@ -571,7 +567,7 @@ namespace IronPython.Runtime.Types {
                 if (!File.Exists(xml)) {
                     xml = Path.Combine(baseDir, baseFile);
                     if (!File.Exists(xml)) {
-#if !NETCOREAPP && !NETSTANDARD
+#if NETFRAMEWORK
                         // On .NET 4.0 documentation is in the reference assembly location
                         // for 64-bit processes, we need to look in Program Files (x86)
                         xml = Path.Combine(

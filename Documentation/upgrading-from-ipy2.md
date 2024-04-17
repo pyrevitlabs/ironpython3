@@ -31,6 +31,55 @@ System.StringSplitOptions["None"]
 
 Similarly, `True` and `False` are also keywords in Python 3.
 
+## Redirecting output
+
+With IronPython 2, standard output was written to the runtime's `SharedIO.OutputWriter` (which was `Console.Out` by default). This is no longer the case with IronPython 3 where the standard output is a binary stream. The output is now written to runtime's `SharedIO.OutputStream`. Similarly, standard input and error are now using `SharedIO.InputStream` and `SharedIO.ErrorStream` respectively.
+
+Because of this, using a `TextWriter` to capture output will no longer work. As a workaround, in order to use a `TextWriter` as the main method of redirection, one could wrap the writer inside a stream (for example, see [`TextStream`][TextStream]).
+
+```c#
+// IronPython 2
+var engine = Python.CreateEngine();
+var textWriter = new MyTextWriter();
+// no longer works in IronPython 3!
+engine.Runtime.IO.RedirectToConsole();
+Console.SetOut(textWriter);
+```
+
+```c#
+// IronPython 3
+var engine = Python.CreateEngine();
+var textWriter = new MyTextWriter();
+engine.Runtime.IO.SetOutput(new TextStream(textWriter), textWriter);
+```
+
+Another way of achieving the redirection behavior similar to IronPython 2 is to set engine option `ConsoleSupportLevel` to `SupportLevel.Basic`. IronPython 3 still uses binary streams for standard input and output but **all three** standard streams are set to use `TextStream`, forwarding to the corresponding writers/reader.
+
+```c#
+// IronPython 3
+var engine = Python.CreateEngine(new Dictionary<string, object> { 
+    { "ConsoleSupportLevel", Microsoft.Scripting.Runtime.SharedIO.SupportLevel.Basic },
+});
+var textWriter = new MyTextWriter();
+// works again!
+engine.Runtime.IO.RedirectToConsole();
+Console.SetOut(textWriter);
+```
+
+This method is particularly useful when embedding the IronPython 3 engine in a host that sets console's writers/reader before the engine is created and the host's code is not accessible to the user (for instance, scripting in [LINQPad]).
+
+```c#
+// IronPython 3 in LINQPad
+var engine = Python.CreateEngine(new Dictionary<string, object> { 
+    { "ConsoleSupportLevel", Microsoft.Scripting.Runtime.SharedIO.SupportLevel.Basic },
+});
+engine.Execute("print('abc')"); // shows output in the "Results" pane
+dynamic ans = engine.Execute("input()"); // pauses the script and asks for input at the bottom of the "Results" pane; terminate your input with Ctrl+Z, Enter
+```
+
+[TextStream]: https://github.com/IronLanguages/dlr/blob/master/Src/Microsoft.Scripting/Utils/TextStream.cs
+[LINQPad]: https://www.linqpad.net/
+
 ## `int` Type
 
 One of the major backward incompatible changes in Python 3 is [PEP 237 – Unifying Long Integers and Integers][PEP 0237]: Essentially, `long` renamed to `int`. That is, there is only one built-in integral type, named `int`; but it behaves mostly like the old `long` type. From the pure Python perspective this means that `int` should be used wherever previously `long` was used. More consideration has to be applied in interop cases with .NET.
@@ -104,11 +153,11 @@ The creation of either `Int32` or `BigInteger` instances happens automatically b
 False
 ```
 
-In the opposite direction, if it is essential to create `Int32` objects, either use constructors for `int` or `Int32`. In the current implementation, the former converts an integer to `Int32` if the value fits in 32 bits, otherwise it leaves it as `BigInteger`. The latter throws an exception is the conversion is not possible. Although the behavior of the constructor `int` may or may not change in the future, it is always guaranteed to convert the value to the "canonical form" adopted for that version of IronPython.
+In the opposite direction, if it is essential to create `Int32` objects, either use constructors for `int` or `Int32`. In the current implementation, the former converts an integer to `Int32` if the value fits in 32 bits, otherwise it leaves it as `BigInteger`. The latter throws an exception if the conversion is not possible. Although the behavior of the constructor `int` may or may not change in the future, it is always guaranteed to convert the value to the "canonical form" adopted for that version of IronPython.
 
 ```pycon
 >>> # k is a BigInteger that fits in 32 bits
->>> isinstance(j, System.Int32)
+>>> isinstance(k, System.Int32)
 False
 >>> hex(k)
 '0x7fffffff'
@@ -150,7 +199,7 @@ When an `int` object is serialized using `pickle.dump(x, myfile)` and subsequent
 
 ### BigIntegerV2 API
 
-In IronPython 2, `long` type carries an obsolete `BigIntegerV2` API, accessible after importing `System`. In IronPython 3 this API is not available directly on `int` instances (regardless whether the instance is `Int32` or `BigInteger`), but is still accessible in some form through `Microsoft.Scripting.Utils.MathUtils` in `Microsoft.Dynamic.dll`.
+In IronPython 2, `long` type carries an obsolete `BigIntegerV2` API, accessible after importing `System`. In IronPython 3 this API is not available directly on `int` instances (regardless of whether the instance is `Int32` or `BigInteger`), but is still accessible in some form through `Microsoft.Scripting.Utils.MathUtils` in `Microsoft.Dynamic.dll`.
 
 ```pycon
 >>> # IronPython 2
@@ -206,27 +255,3 @@ IronPython's `range` is a generator that produces a sequence of `int` values. Th
 
 [PEP 0237]: https://python.org/dev/peps/pep-0237
 
-
-## Redirecting output
-
-With IronPython 2, standard output was written to the runtime's `SharedIO.OutputWriter` (which was `Console.Out` by default). This is no longer the case with IronPython 3 where the standard output is a binary stream. The output is now written to runtime's `SharedIO.OutputStream`. Similarly, standard input and error are now using `SharedIO.InputStream` and `SharedIO.ErrorStream` respectively.
-
-Because of this, using a `TextWriter` to capture output will no longer work. As a workaround, in order to use a `TextWriter` as the main method of redirection, one could wrap the writer inside a stream (for example, see [TextStream][TextStream]).
-
-IronPython 2
-```c#
-var engine = Python.CreateEngine();
-var textWriter = new MyTextWriter();
-// no longer works!
-engine.Runtime.IO.RedirectToConsole();
-Console.SetOut(textWriter);
-```
-
-IronPython 3
-```c#
-var engine = Python.CreateEngine();
-var textWriter = new MyTextWriter();
-engine.Runtime.IO.SetOutput(new TextStream(textWriter), textWriter);
-```
-
-[TextStream]: https://github.com/IronLanguages/main/blob/master/Runtime/Microsoft.Dynamic/Utils/TextStream.cs
