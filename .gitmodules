@@ -1,4 +1,4 @@
 [submodule "Src/DLR"]
 	path = Src/DLR
-	url = https://github.com/dosymep/dlr.git
-	branch = pyrevit-main
+	url = https://github.com/pyrevitlabs/dlr.git
+	branch = pyrevit-5-main
