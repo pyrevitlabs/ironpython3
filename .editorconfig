@@ -98,3 +98,4 @@ dotnet_diagnostic.CA5372.severity = suggestion  # CA5372: Use XmlReader For XPat
 dotnet_diagnostic.CA2263.severity = none        # CA2263: Prefer generic overload when type is known
 dotnet_diagnostic.CA1514.severity = none        # CA1514: Avoid redundant length argument
 dotnet_diagnostic.CA2265.severity = none        # CA2265 : Ne pas comparer Span<T> ou nulldefault
+dotnet_diagnostic.CA2263.severity = none        # CA2263: Prefer generic overload when type is known
