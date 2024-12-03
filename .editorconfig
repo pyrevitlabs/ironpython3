@@ -96,3 +96,4 @@ dotnet_diagnostic.CA5351.severity = suggestion  # CA5351: Do Not Use Broken Cryp
 dotnet_diagnostic.CA5359.severity = suggestion  # CA5359: Do Not Disable Certificate Validation
 dotnet_diagnostic.CA5372.severity = suggestion  # CA5372: Use XmlReader For XPathDocument
 dotnet_diagnostic.CA2263.severity = none        # CA2263: Prefer generic overload when type is known
+dotnet_diagnostic.CA1514.severity = none        # CA1514: Avoid redundant length argument
