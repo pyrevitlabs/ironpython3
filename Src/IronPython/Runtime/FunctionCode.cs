@@ -202,7 +202,7 @@ namespace IronPython.Runtime {
 
                                 lock (pyCtx._codeUpdateLock) {
                                     if (context.LanguageContext.EnableTracing == enableTracing) {
-                                        LightThrowTarget = target;
+                                        LightThrowTarget = _lambda is Compiler.Ast.FunctionDefinition ? AddRecursionCheck(pyCtx, target) : target;
                                     }
                                 }
                             } catch (InvalidOperationException ex) {
