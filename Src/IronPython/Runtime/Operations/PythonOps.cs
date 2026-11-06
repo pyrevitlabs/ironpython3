@@ -19,6 +19,7 @@ using System.Numerics;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
+using System.Runtime.ExceptionServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
@@ -2471,6 +2472,19 @@ namespace IronPython.Runtime.Operations {
             Debug.Assert(t[1] == GetRawContextException());
             Exception e = MakeExceptionWorker(context, t[0], t[1], t[2], null, suppressContext: false, forRethrow: true);
             return MakeRethrowExceptionWorker(e);
+        }
+
+        /// <summary>
+        /// Rethrows an exception a frame caught and stored, once its catch block has exited.
+        /// </summary>
+        /// <remarks>
+        /// Rethrowing from inside the catch block would start a nested exception dispatch on
+        /// top of the frames still being unwound, so each Python frame an exception crosses
+        /// would keep several KB of stack alive and deep call chains would overflow the stack.
+        /// The .NET stack trace is preserved as with a plain rethrow.
+        /// </remarks>
+        public static void RethrowDeferredException(Exception e) {
+            ExceptionDispatchInfo.Capture(e).Throw();
         }
 
         /// <summary>

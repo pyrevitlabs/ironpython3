@@ -487,6 +487,48 @@ namespace IronPython.Compiler.Ast {
         #region Runtime Line Number Tracing
 
         /// <summary>
+        /// Runs <paramref name="onCatch"/> for any exception <paramref name="body"/> throws, then
+        /// rethrows that exception after the catch block has exited.
+        /// </summary>
+        /// <remarks>
+        /// Equivalent to <c>catch (Exception e) { onCatch; throw; }</c>, except that the rethrow
+        /// happens outside the catch block (see <c>PythonOps.RethrowDeferredException</c>),
+        /// so unwinding a deep Python call chain does not overflow the stack.
+        /// </remarks>
+        internal static MSAst.Expression/*!*/ RethrowAfterCatch(MSAst.Expression/*!*/ body, MSAst.ParameterExpression/*!*/ caught, MSAst.Expression/*!*/ onCatch) {
+            MSAst.ParameterExpression pending = Ast.Variable(typeof(Exception), "$pendingException");
+            MSAst.Expression tryCatch = Ast.TryCatch(
+                body,
+                Ast.Catch(
+                    caught,
+                    Ast.Block(
+                        onCatch,
+                        Ast.Assign(pending, caught),
+                        Ast.Default(body.Type)
+                    )
+                )
+            );
+            MSAst.Expression rethrow = Ast.IfThen(
+                Ast.NotEqual(pending, AstUtils.Constant(null, typeof(Exception))),
+                Ast.Call(AstMethods.RethrowDeferredException, pending)
+            );
+            MSAst.Expression clearPending = Ast.Assign(pending, AstUtils.Constant(null, typeof(Exception)));
+
+            if (body.Type == typeof(void)) {
+                return Ast.Block(new[] { pending }, clearPending, tryCatch, rethrow);
+            }
+
+            MSAst.ParameterExpression result = Ast.Variable(body.Type, "$result");
+            return Ast.Block(
+                new[] { pending, result },
+                clearPending,
+                Ast.Assign(result, tryCatch),
+                rethrow,
+                result
+            );
+        }
+
+        /// <summary>
         /// Gets the expression for updating the dynamic stack trace at runtime when an
         /// exception is thrown.
         /// </summary>
@@ -539,16 +581,7 @@ namespace IronPython.Compiler.Ast {
             if (canThrow) {
                 body = Ast.Block(
                     new[] { LineNumberExpression, LineNumberUpdated },
-                    Ast.TryCatch(
-                        body,
-                        Ast.Catch(
-                            _catchException,
-                            Ast.Block(
-                                GetUpdateTrackbackExpression(_catchException),
-                                Ast.Rethrow(body.Type)
-                            )
-                        )
-                    )
+                    RethrowAfterCatch(body, _catchException, GetUpdateTrackbackExpression(_catchException))
                 );
             }
 
