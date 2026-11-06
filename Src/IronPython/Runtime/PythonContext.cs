@@ -149,7 +149,7 @@ namespace IronPython.Runtime {
         internal readonly object _codeCleanupLock = new object();
         internal readonly object _codeUpdateLock = new object();
         internal int _codeCount, _nextCodeCleanup = 200;
-        private int _recursionLimit;
+        private int _recursionLimit = int.MaxValue;
 
         private readonly object _indexBindersLock = new object(); // https://github.com/IronLanguages/ironpython3/issues/1596
 
@@ -340,9 +340,10 @@ namespace IronPython.Runtime {
                 }
 
                 lock (_codeUpdateLock) {
+                    bool wasEnforced = _recursionLimit != int.MaxValue;
                     _recursionLimit = value;
 
-                    if ((_recursionLimit == int.MaxValue) != (value == int.MaxValue)) {
+                    if (wasEnforced != (value != int.MaxValue)) {
                         // recursion setting has changed, we need to update all of our
                         // function codes to enforce or un-enforce recursion.
                         FunctionCode.UpdateAllCode(this);
