@@ -37,6 +37,7 @@ namespace IronPython.Compiler.Ast {
         public static readonly MethodInfo RemoveModule = GetMethod((Action<CodeContext, string, object>)PythonOps.RemoveModule);
         public static readonly MethodInfo ModuleStarted = GetMethod((Action<CodeContext, ModuleOptions>)PythonOps.ModuleStarted);
         public static readonly MethodInfo MakeRethrownException = GetMethod((Func<CodeContext, Exception>)PythonOps.MakeRethrownException);
+        public static readonly MethodInfo RethrowDeferredException = GetMethod((Action<Exception>)PythonOps.RethrowDeferredException);
         public static readonly MethodInfo MakeRethrowExceptionWorker = GetMethod((Func<Exception, Exception>)PythonOps.MakeRethrowExceptionWorker);
         public static readonly MethodInfo MakeException = GetMethod((Func<CodeContext, object, Exception>)PythonOps.MakeException);
         public static readonly MethodInfo MakeExceptionWithCause = GetMethod((Func<CodeContext, object, object, Exception>)PythonOps.MakeExceptionWithCause);
